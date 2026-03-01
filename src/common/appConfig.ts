@@ -6,6 +6,6 @@ interface AppConfigProps {
 
 export const APP_CONFIG: AppConfigProps = {
 	appName: "my-app",
-	headerColor: "#ffaa00",
-	headerHeight: 64,
+	headerColor: "#242424",
+	headerHeight: 40,
 };

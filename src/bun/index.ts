@@ -1,4 +1,7 @@
-import { BrowserWindow, Updater } from "electrobun/bun";
+import { BrowserView, BrowserWindow, Updater } from "electrobun/bun";
+import { Electroview } from "electrobun/view";
+import os from "os";
+import { rpcSystem, RPCSystemType } from "./rpc/rpcSystem";
 
 const DEV_SERVER_PORT = 5173;
 const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
@@ -25,7 +28,7 @@ async function getMainViewUrl(): Promise<string> {
 // Create the main application window
 const url = await getMainViewUrl();
 
-const mainWindow = new BrowserWindow({
+const win = new BrowserWindow({
 	title: "React + Tailwind + Vite",
 	url,
 	frame: {
@@ -35,6 +38,7 @@ const mainWindow = new BrowserWindow({
 		y: 200,
 	},
 	titleBarStyle: "hiddenInset",
+	rpc: rpcSystem,
 });
 
 console.log("React Tailwind Vite app started!");

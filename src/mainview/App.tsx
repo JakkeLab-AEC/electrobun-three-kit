@@ -36,7 +36,7 @@ function App() {
 				<Header osName={osName} />
 			</div>
 			<div>
-				<ThreeViewPort />
+				<ThreeViewPort viewName="main" />
 			</div>
 		</div>
 	);

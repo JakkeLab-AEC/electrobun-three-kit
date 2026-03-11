@@ -1,60 +1,88 @@
 import { useEffect, useRef } from "react";
-import * as THREE from "three";
 import {
 	RendererType,
 	SceneController,
 } from "../../../lib/three/sceneController";
 
 interface ThreeViewPortProps {
-	type?: RendererType;
 	viewName: string;
+	type?: RendererType;
+	destroyOnUnmount?: boolean;
+	className?: string;
+	style?: React.CSSProperties;
 }
 
-export default function ThreeViewPort(opt: ThreeViewPortProps) {
+export default function ThreeViewPort({
+	viewName,
+	type = "WebGPU",
+	destroyOnUnmount = false,
+	className,
+	style,
+}: ThreeViewPortProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const canvasWidth = window.innerWidth;
-	const canvasHeight = window.innerHeight;
 
 	useEffect(() => {
-		if (canvasRef.current) {
-			let sceneController: SceneController | undefined =
-				SceneController.getInstance(opt.viewName);
+		const canvas = canvasRef.current;
+		if (!canvas) return;
 
-			if (!sceneController) {
-				const renderer = SceneController.createRenderer({
-					type: opt.type ?? "WebGPU",
-					canvas: canvasRef.current,
-					antialias: true,
-				});
-			} else {
-				const renderer = SceneController.createRenderer({
-					type: opt.type ?? "WebGPU",
-					canvas: canvasRef.current,
-				});
-				sceneController.replaceRenderer(renderer);
-			}
-		}
+		let mounted = true;
+		let resizeObserver: ResizeObserver | null = null;
+		let controller: SceneController | null = null;
 
-		// ViewPort Resizer
-		const handleResize = () => {
-			if (canvasRef.current) {
-				const canvasWidth = window.innerWidth;
-				const canvasHeight = window.innerHeight;
-				canvasRef.current.width = canvasWidth;
-				canvasRef.current.height = canvasHeight;
-				SceneController.getInstance(opt.viewName)?.resize(
-					canvasWidth,
-					canvasHeight,
-				);
+		const setup = async () => {
+			controller = await SceneController.createOrGet({
+				viewName,
+				canvas,
+				rendererType: type,
+				viewType: "Perspective3D",
+				antialias: true,
+			});
+
+			if (!mounted) return;
+
+			const resize = () => {
+				controller?.resizeFromCanvas();
+			};
+
+			resize();
+
+			resizeObserver = new ResizeObserver(() => {
+				resize();
+			});
+
+			const parent = canvas.parentElement;
+			if (parent) {
+				resizeObserver.observe(parent);
 			}
 		};
 
-		window.addEventListener("resize", handleResize);
+		setup().catch((error) => {
+			console.error(
+				`[ThreeViewPort:${viewName}] initialization failed`,
+				error,
+			);
+		});
 
 		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
-	}, []);
+			mounted = false;
+			resizeObserver?.disconnect();
 
-	return <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} />;
+			if (destroyOnUnmount) {
+				SceneController.destroyInstance(viewName);
+			}
+		};
+	}, [viewName, type, destroyOnUnmount]);
+
+	return (
+		<canvas
+			ref={canvasRef}
+			className={className}
+			style={{
+				width: "100%",
+				height: "100%",
+				display: "block",
+				...style,
+			}}
+		/>
+	);
 }

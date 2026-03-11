@@ -10,33 +10,51 @@ const rpc = Electroview.defineRPC<RPCSystemTypeView>({
 	handlers: { requests: {}, messages: {} },
 });
 
+const electrobun = new Electrobun.Electroview({ rpc });
+
 function App() {
 	const [osName, setOSName] = useState<OSName>(OSName.NotSupported);
 
-	const electrobun = new Electrobun.Electroview({ rpc });
-	const getOSName = async () => {
-		const message = await electrobun.rpc!.request.getOS({});
-		setOSName(message);
-	};
+	useEffect(() => {
+		const getOSName = async () => {
+			const message = await electrobun.rpc!.request.getOS({});
+			setOSName(message);
+		};
 
-	getOSName();
+		getOSName();
+	}, []);
 
 	return (
-		<div style={{ position: "relative", width: "100%", height: "100%" }}>
-			{/* Header */}
+		<div
+			style={{
+				position: "relative",
+				width: "100vw",
+				height: "100vh",
+				overflow: "hidden",
+			}}
+		>
+			<div
+				style={{
+					position: "absolute",
+					inset: 0,
+					zIndex: 0,
+				}}
+			>
+				<ThreeViewPort viewName="main" />
+			</div>
+
 			<div
 				className="electrobun-webkit-app-region-drag"
 				style={{
 					position: "absolute",
-					width: "100%",
+					top: 0,
+					left: 0,
+					right: 0,
 					zIndex: 1000,
-					userSelect: "none",
+					pointerEvents: "auto",
 				}}
 			>
 				<Header osName={osName} />
-			</div>
-			<div>
-				<ThreeViewPort viewName="main" />
 			</div>
 		</div>
 	);

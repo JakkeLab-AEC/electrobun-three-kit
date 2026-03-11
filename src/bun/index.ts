@@ -37,8 +37,8 @@ const win = new BrowserWindow({
 		x: 200,
 		y: 200,
 	},
-	titleBarStyle: "hiddenInset",
 	rpc: rpcSystem,
+	titleBarStyle: "hiddenInset",
 });
 
 console.log("React Tailwind Vite app started!");

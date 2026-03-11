@@ -1,4 +1,4 @@
-.comp-header-drag {
+.comp-header-no-drag {
 	user-select: none;
-	-webkit-user-select: none;
+	cursor: default;
 }

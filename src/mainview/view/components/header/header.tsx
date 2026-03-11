@@ -17,7 +17,7 @@ export default function CompHeader({
 }: HeaderProps) {
 	return (
 		<div
-			className="titlebar"
+			className="titlebar electrobun-webkit-app-region-drag comp-header-no-drag"
 			style={{
 				width: "100%",
 				background: headerColor,
@@ -29,6 +29,7 @@ export default function CompHeader({
 				borderBottomWidth: 1,
 				borderBottomColor: "#000000",
 			}}
+			onDoubleClick={(e) => console.log(e)}
 		>
 			<div
 				style={{
